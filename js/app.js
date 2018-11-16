@@ -2,6 +2,7 @@
 	const searchButton = document.querySelector('#searchButton');
 	const searchInput = document.querySelector('#searchInput');
 	const searchResults = document.querySelector('#searchResults');
+	const resultsTable = document.querySelector('#resultsTable');
 	var resultRepos = document.querySelector('#resultRepos');
 	var resultProfile = document.querySelector('#resultProfile');
 	var user;
@@ -27,45 +28,78 @@
 	}
 	//print profile
 	const printProfile = (user) => {
-		var profileView = `
-			<img src="${user.avatar_url}" alt="user profile photo" with="90px" height="90px">
-			<div class="d-inline-flex  flex-column  ml-3">
-				<h4 class="m-0">@${user.login}</h4>
-				<h2 class="m-0">${user.name}</h2>
-				<p class="m-0">${user.bio}</p>
-			</div>
-		`;
 		
-		resultProfile.innerHTML = profileView;
+		var avatar = document.createElement('img');
+		avatar.setAttribute('src', user.avatar_url);
+		avatar.setAttribute('alt', 'user\'s avatar image');
+		avatar.setAttribute('width', '90px');
+		avatar.setAttribute('height', '90px');
+
+		var info = document.createElement('div');
+		info.classList.add('d-inline-flex','flex-column','ml-3');
+
+		var login = document.createElement('h6');
+		login.classList.add('m-0');
+		login.textContent = '@' + user.login;
+
+		var name = document.createElement('h2');
+		name.classList.add('m-0');
+		name.textContent = user.name;
+
+		var bio = document.createElement('p');
+		bio.classList.add('m-0');
+		bio.textContent = (user.bio === null) ? 'This user doesn\'t have bio' : user.bio ;
+
+		info.appendChild(login);
+		info.appendChild(name);
+		info.appendChild(bio);
+		
+		resultProfile.appendChild(avatar);
+		resultProfile.appendChild(info);
 	}
 	//print repos
 	const printRepos = (repos) => {
-		var reposTable = '<b class="d-block my-1">Repositories</b>';
-		var reposInfo = [];
+	
+		var reposHeader = document.createElement('b');
+		reposHeader.id = 'reposHeader';
+		reposHeader.classList.add('d-block', 'my-1');
+		reposHeader.textContent = 'Repositories';
 
-		repos.map((repo) => reposInfo.push([repo.name, repo.stargazers_count, repo.forks_count]));
-		
-		reposInfo.forEach((repo) => {
-			reposTable += `
-				<tr>
-					<th>${repo[0]}</th>
-					<td class="text-right">
-						<i class="fas fa-star"></i> ${repo[1]} 
-						<i class="fas fa-code-branch"></i> ${repo[2]}
-					</td>
-				</tr>
-			`;
-		})
+		resultsTable.before(reposHeader);
 
-		resultRepos.innerHTML = reposTable;
+		repos.forEach((repo) => {
+			
+			var tr = document.createElement('tr');
+			var th = document.createElement('th');
+			var td = document.createElement('td');
+			var i_star = document.createElement('i');
+			var span_star = document.createElement('span');
+			var i_fork = document.createElement('i');
+			var span_fork = document.createElement('span');
+
+			th.textContent = repo.name;
+			td.classList.add('text-right','d-flex','blablacar');
+			i_star.classList.add('fas', 'fa-star');
+			span_star.textContent = repo.stargazers_count;
+			i_fork.classList.add('fas', 'fa-code-branch');
+			span_fork.textContent = repo.forks_count;
+
+			td.appendChild(i_star);
+			td.appendChild(span_star);
+			td.appendChild(i_fork);
+			td.appendChild(span_fork);
+			tr.appendChild(th);
+			tr.appendChild(td);
+			resultRepos.appendChild(tr);
+		});
 	}
 	//print error
 	const printError = (error) => {
-		resultRepos.innerHTML = `
-			<div class="alert alert-danger mt-3" role="alert">
-				${error}
-			</div>
-		`;
+		var div = document.createElement('div');
+		div.classList.add('alert','alert-danger','mt-3');
+		div.textContent = error;
+
+		resultRepos.appendChild(div);
 	}
 	//search Repos
 		//clean previows search
@@ -77,8 +111,17 @@
 		//clean and reFocus search value
 	const searchRepos = async (userToFetch) => {
 
-		resultRepos.innerHTML = '';
-		resultProfile.innerHTML = '';
+		while (resultRepos.firstChild){
+			resultRepos.removeChild(resultRepos.firstChild);
+		}
+
+		var b = document.getElementById('reposHeader');
+		if ( b )
+			searchResults.removeChild(document.getElementById('reposHeader'));
+
+		while (resultProfile.firstChild){
+			resultProfile.removeChild(resultProfile.firstChild);
+		}
 
 		searchResults.removeAttribute("hidden");
 
