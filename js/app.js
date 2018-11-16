@@ -27,7 +27,6 @@
 	}
 	//print profile
 	const printProfile = (user) => {
-
 		var profileView = `
 			<img src="${user.avatar_url}" alt="user profile photo" with="90px" height="90px">
 			<div class="d-inline-flex  flex-column  ml-3">
@@ -41,7 +40,6 @@
 	}
 	//print repos
 	const printRepos = (repos) => {
-		
 		var reposTable = '<b class="d-block my-1">Repositories</b>';
 		var reposInfo = [];
 
@@ -76,26 +74,30 @@
 		//display info user or error
 		//fetch repos
 		//display repos or error
+		//clean and reFocus search value
 	const searchRepos = async (userToFetch) => {
-		/*0*/
+
 		resultRepos.innerHTML = '';
 		resultProfile.innerHTML = '';
-		/*1*/
+
 		searchResults.removeAttribute("hidden");
-		/*2*/
+
 		await fetchUser(userToFetch);
-		/*3*/
+
 		if (user === 404)
 			return printError('This user doesn\'t exist');
 		else
 			printProfile(user);
-		/*4*/
+
 		await fetchRepos(user.repos_url);
-		/*5*/
+
 		if (!repos.length)
 			return printError('This user have no repositories');
 		else
 			printRepos(repos);
+
+		searchInput.value = '';
+		searchInput.focus();
 	}
 
 	//listeners 
